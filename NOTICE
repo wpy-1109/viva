@@ -1,0 +1,13 @@
+Viva 原创代码使用仓库根目录的 MIT License。
+
+本仓库没有复制以下项目的源码，也没有把它们列为 npm 依赖：
+
+- DeepSeek Harness，https://github.com/deepseek-ai/deepseek-harness
+  MIT，Copyright (c) 2026 DeepSeek。
+  核对过的钉死版本是标签 dsh-v0.2.3-alpha.2，提交 4b399c39a6d1479cd84ca591b4d7c88e24d38a96，
+  npm 包 @deepseek-ai/dsh@0.2.3-alpha.2。Viva 只在设置了 VIVA_DSH_BIN 时执行该二进制的 --version。
+- dsh-superagent-prototype，https://github.com/deepseek-ai/dsh-superagent-prototype
+  MIT，Copyright (c) 2026 DeepSeek Harness Team。
+  核对过的提交是 8c32a9dc5d72c033816c6a8110b37f40cf94fba4。它被记录为研究原型，执行集成保持 pending。
+
+第三方 npm 包保留各自的许可证，随 node_modules 安装，不并入本 NOTICE 的版权。

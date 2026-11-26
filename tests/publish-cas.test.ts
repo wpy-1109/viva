@@ -1,0 +1,41 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+import { applicability, publishProposal } from "../src/knowledge/publish.js";
+import { createSource } from "../src/sources/registry.js";
+import { syncSource } from "../src/sources/sync.js";
+import { openDatabase } from "../src/db/database.js";
+import { tempWorkspace } from "./helpers.js";
+
+describe("proposal compare-and-swap", () => {
+  it("refuses a stale proposal after a newer publish from another client", () => {
+    const { dir, db } = tempWorkspace();
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "viva-cas-"));
+    const file = path.join(root, "note.md");
+    fs.writeFileSync(file, "第一版基线，等待审阅。\n");
+    const source = createSource(db, { kind: "local", name: "比较", root, nowMs: 1 });
+    syncSource(db, source.id, { nowMs: 2 });
+    publishProposal(db, (db.prepare("SELECT id FROM proposals").get() as { id: string }).id, 3);
+    fs.writeFileSync(file, "第二版，先到的客户端会发布。\n");
+    syncSource(db, source.id, { nowMs: 4 });
+    fs.writeFileSync(file, "第三版，后到的客户端不能覆盖。\n");
+    syncSource(db, source.id, { nowMs: 5 });
+    const pending = db.prepare("SELECT id FROM proposals WHERE status = 'pending_review' ORDER BY created_at").all() as { id: string }[];
+    expect(pending).toHaveLength(2);
+    const other = openDatabase(dir);
+    expect(publishProposal(db, pending[0].id, 6).status).toBe("approved");
+    expect(applicability(other, other.prepare("SELECT * FROM proposals WHERE id = ?").get(pending[1].id) as never).applicable).toBe(false);
+    expect(() => publishProposal(other, pending[1].id, 7)).toThrow(/not_pending/);
+    const published = db.prepare("SELECT text FROM published_chunks").get() as { text: string };
+    expect(published.text).toContain("第二版");
+    expect(published.text).not.toContain("第三版");
+    const refreshed = db.prepare("SELECT status, candidate_text, base_text FROM proposals WHERE status = 'pending_review'").get() as { status: string; candidate_text: string; base_text: string };
+    expect(refreshed.base_text).toContain("第二版");
+    expect(refreshed.candidate_text).toContain("第三版");
+    expect(applicability(db, db.prepare("SELECT * FROM proposals WHERE status = 'pending_review'").get() as never).applicable).toBe(true);
+    expect(publishProposal(db, (db.prepare("SELECT id FROM proposals WHERE status = 'pending_review'").get() as { id: string }).id, 8).status).toBe("approved");
+    expect((db.prepare("SELECT text FROM published_chunks").get() as { text: string }).text).toContain("第三版");
+    other.close();
+  });
+});

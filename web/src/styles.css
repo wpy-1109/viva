@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+:root {
+  color: #1b1914;
+  background: #f3efe6;
+  font-family: "WenQuanYi Micro Hei", "Noto Sans CJK SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+body { margin: 0; }
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  background: #0b5d43;
+  color: white;
+  padding: 0.5rem 0.8rem;
+  z-index: 10;
+}
+.skip:focus { top: 1rem; }
+
+:focus-visible {
+  outline: 3px solid #0b5d43;
+  outline-offset: 2px;
+}
+
+button, input, textarea, select { font: inherit; }

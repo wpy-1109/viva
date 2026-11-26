@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    environment:
+      VIVA_HOST: 0.0.0.0
+      VIVA_ALLOW_NONLOCAL: "1"
+      VIVA_DOCKER: "1"
+      VIVA_DATA_DIR: /data
+      VIVA_PORT: "43123"
+    ports:
+      - "127.0.0.1:43123:43123"
+    volumes:
+      - viva-data:/data
+  worker:
+    build: .
+    command: ["node", "dist/worker/main.js"]
+    environment:
+      VIVA_DATA_DIR: /data
+      VIVA_WORKER_CONCURRENCY: "2"
+    volumes:
+      - viva-data:/data
+    restart: unless-stopped
+
+volumes:
+  viva-data:

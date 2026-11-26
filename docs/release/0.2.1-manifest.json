@@ -1,0 +1,21 @@
+{
+  "name": "viva",
+  "version": "0.2.1",
+  "node": ">=22.13",
+  "prerequisites": ["Node.js >=22.13", "npm ci 需要网络以下载依赖"],
+  "features": {
+    "demoLoop": "fixture",
+    "openaiTransport": "local-http-fixture",
+    "liveModel": "unavailable-without-key",
+    "feishuInboundSignature": "contract-test",
+    "dingtalkPlainHmac": "contract-test",
+    "dingtalkEncryptedCallback": "documented-algorithm-cross-checked-not-official-ciphertext",
+    "dshHeadless": "optional-text-only-patch-not-os-sandbox",
+    "docker": "compose-file-not-executed"
+  },
+  "acceptanceFixes": ["D1", "D2", "D3", "D4", "npm-audit-high-critical", "stale-proposal-refresh"],
+  "archives": {
+    "source": "viva-0.2.1-source.tgz",
+    "readyLinux": "viva-0.2.1-easy-linux.tgz"
+  }
+}
